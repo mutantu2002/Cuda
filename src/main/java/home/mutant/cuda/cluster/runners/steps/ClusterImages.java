@@ -1,4 +1,4 @@
-package home.mutant.cuda.runners.steps;
+package home.mutant.cuda.cluster.runners.steps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import home.mutant.cuda.Kernel;
-import home.mutant.cuda.MemoryFloat;
-import home.mutant.cuda.MemoryInt;
-import home.mutant.cuda.Program;
+import home.mutant.cuda.model.Kernel;
+import home.mutant.cuda.model.MemoryFloat;
+import home.mutant.cuda.model.MemoryInt;
+import home.mutant.cuda.model.Program;
 import home.mutant.dl.models.Image;
 import home.mutant.dl.models.ImageFloat;
 import home.mutant.dl.utils.kmeans.Kmeans;
@@ -57,10 +57,10 @@ public class ClusterImages {
 		return clusterLabels;
 	}
 	public void cluster(){
-		prepareOpenCl();
+		prepareCuda();
 		for (int iteration=0;iteration<noIterations;iteration++){
 			
-			updateCenters.run(images.size(), 1000);
+			updateCenters.run(images.size(), 256);
 			program.finish();
 			memUpdates.copyDtoH();
 			reduceCenters();
@@ -131,7 +131,7 @@ public class ClusterImages {
 			}
 		}
 	}
-	private void prepareOpenCl(){
+	private void prepareCuda(){
 		Map<String, Object> params = new HashMap<>();
 		params.put("imageSize", imageSize);
 		program = new Program("src/main/resources/Kmeans2.ptx",params);		
@@ -157,7 +157,7 @@ public class ClusterImages {
 		memImages.copyHtoD();
 		
 	}
-	public void releaseOpenCl(){
+	public void releaseCuda(){
 		memClusters.release();
 		memImages.release();
 		memUpdates.release();

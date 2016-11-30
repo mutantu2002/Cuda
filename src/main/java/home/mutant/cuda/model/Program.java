@@ -1,4 +1,4 @@
-package home.mutant.cuda;
+package home.mutant.cuda.model;
 
 
 import static jcuda.driver.JCudaDriver.*;

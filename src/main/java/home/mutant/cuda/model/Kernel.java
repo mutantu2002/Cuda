@@ -1,16 +1,13 @@
-package home.mutant.cuda;
+package home.mutant.cuda.model;
 
-import static org.jocl.CL.*;
+import static jcuda.driver.JCudaDriver.cuLaunchKernel;
+import static jcuda.driver.JCudaDriver.cuModuleGetFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jocl.Sizeof;
-import org.jocl.cl_kernel;
-
 import jcuda.Pointer;
-import jcuda.driver.*;
-import static jcuda.driver.JCudaDriver.*;
+import jcuda.driver.CUfunction;
 
 public class Kernel {
 	Program program;
