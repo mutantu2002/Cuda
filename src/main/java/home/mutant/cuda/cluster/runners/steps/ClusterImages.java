@@ -60,7 +60,7 @@ public class ClusterImages {
 		prepareCuda();
 		for (int iteration=0;iteration<noIterations;iteration++){
 			
-			updateCenters.run(images.size(), 256);
+			updateCenters.run(images.size()/256, 256);
 			program.finish();
 			memUpdates.copyDtoH();
 			reduceCenters();

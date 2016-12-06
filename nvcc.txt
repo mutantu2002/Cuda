@@ -1,1 +1,3 @@
 nvcc -ptx Kmeans2.cu -o Kmeans2.ptx -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin"
+nvcc -ptx Perceptron.cu -o Perceptron.ptx -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin"
+nvcc -ptx TwoLayersPerceptron.cu -o TwoLayersPerceptron.ptx -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin"

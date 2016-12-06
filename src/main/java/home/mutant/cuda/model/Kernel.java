@@ -1,7 +1,6 @@
 package home.mutant.cuda.model;
 
-import static jcuda.driver.JCudaDriver.cuLaunchKernel;
-import static jcuda.driver.JCudaDriver.cuModuleGetFunction;
+import static jcuda.driver.JCudaDriver.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,9 @@ public class Kernel {
 		arguments.add(Pointer.to(new int[]{value}));
 	}
 	
-	
+	public void setArgument(int value, int index){
+		arguments.set(index,Pointer.to(new int[]{value}));
+	}	
 	public void setArguments(MemoryDouble ... memories){
 		for (MemoryDouble memory:memories) {
 			addArgument(memory);
@@ -48,13 +49,15 @@ public class Kernel {
 			addArgument(memory);
 		}
 	}
-	public int run(int globalworkSize, int localWorksize)
+	public int run(int gridDimX, int blockDimX)
 	{
-		return cuLaunchKernel(function,
-				(int)Math.ceil((double)globalworkSize / localWorksize),  1, 1,      // Grid dimension
-				localWorksize, 1, 1,      // Block dimension
+		int res= cuLaunchKernel(function,
+				gridDimX,  1, 1,      // Grid dimension
+				blockDimX, 1, 1,      // Block dimension
 				0, null,               // Shared memory size and stream
 				Pointer.to(arguments.toArray(new Pointer[0])), null // Kernel- and extra parameters
 		);
+		cuCtxSynchronize();
+		return res;
 	}
 }
