@@ -16,13 +16,13 @@ public class Perceptron {
 	float deltas[];
 	float images[];
 	float outputs[];
-	
-	float learningRate = 1;
+	double maxAccuracy = 0;
+	float learningRate = 10;
 	
 	int noThreads = 32*25;
 	int noImages=60000;
 	int imageSize;
-	int trainLabel = 0;
+	int trainLabel = 8;
 	
 	Program program;
 	
@@ -114,7 +114,7 @@ public class Perceptron {
 				modifyWeightsFromDelta();
 				memWeights.copyHtoD();
 			}
-			learningRate/=1.006;
+			//learningRate/=1.006;
 		}
 	}
 	
@@ -153,7 +153,12 @@ public class Perceptron {
 			}
 			total++;
 		}
-		System.out.println((double)count/total);
+		double accuracy = (double)count/total;
+		if(accuracy>maxAccuracy)
+		{
+			maxAccuracy=accuracy;
+			System.out.println(accuracy);
+		}
 	}
 	private boolean output(float[] dataFloat) {
 		float sum=0;
@@ -173,7 +178,7 @@ public class Perceptron {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int noIterations=300;
+		int noIterations=3000;
 		Perceptron  p = new Perceptron(784);
 		long t0=System.currentTimeMillis();
 		p.runAllTrainingSet(noIterations);

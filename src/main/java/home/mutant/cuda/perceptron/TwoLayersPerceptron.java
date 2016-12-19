@@ -14,15 +14,15 @@ import home.mutant.dl.utils.MnistDatabase;
 import home.mutant.dl.utils.MnistDatabase.TYPE;
 
 public class TwoLayersPerceptron {
-	public static final int NO_HIDDEN_NEURONS = 15;
+	public static final int NO_HIDDEN_NEURONS = 5;
 	float weights[];
 	float deltas[];
 	float images[];
 	float outputs[];
-	
+	double maxAccuracy = 0;
 	float learningRate = 1;
 	
-	int noThreads = 32*125;
+	int noThreads = 32*25;
 	int noImages=60000;
 	int imageSize;
 	int trainLabel = 0;
@@ -59,8 +59,8 @@ public class TwoLayersPerceptron {
 			outputs[i] = MnistDatabase.trainLabels.get(i)==trainLabel?1:0;
 		}
 		
-		program = new Program("src/main/resources/TwoLayersPerceptron.ptx",null);	
-		
+		program = new Program("src/main/resources/TwoLayersPerceptronOneHiddenAtATime.ptx",null);	
+		//program = new Program("src/main/resources/TwoLayersPerceptron.ptx",null);
 		memWeights = new MemoryFloat(program);
 		memWeights.add(weights);
 		
@@ -80,6 +80,7 @@ public class TwoLayersPerceptron {
 		deltasBatch.addArgument(memWeightsDeltas);
 		deltasBatch.addArgument(inputsPerBatch);
 		deltasBatch.addArgument(imageSize);
+		deltasBatch.addArgument(0);
 		
 	}
 	
@@ -89,11 +90,12 @@ public class TwoLayersPerceptron {
 	 */
 	public void runAllTrainingSet(int noIterations) {
 		for(int it=0;it<noIterations;it++){
+			deltasBatch.setArgument(it, 6);
 			deltasBatch.run(noThreads/32, 32);
 			memWeightsDeltas.copyDtoH();
 			modifyWeightsFromDelta();
 			memWeights.copyHtoD();
-			learningRate/=1.001;
+			//learningRate/=1.001;
 			test();
 			//showLastWeights();
 		}
@@ -148,7 +150,12 @@ public class TwoLayersPerceptron {
 			}
 			total++;
 		}
-		System.out.println((double)count/total);
+		double accuracy = (double)count/total;
+		if(accuracy>maxAccuracy)
+		{
+			maxAccuracy=accuracy;
+			System.out.println(accuracy);
+		}
 		frame.showImages(getImages());
 	}
 	private boolean output(float[] dataFloat) {
@@ -181,7 +188,7 @@ public class TwoLayersPerceptron {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int noIterations=1000;
+		int noIterations=10000;
 		TwoLayersPerceptron  p = new TwoLayersPerceptron(784);
 		long t0=System.currentTimeMillis();
 		p.runAllTrainingSet(noIterations);
